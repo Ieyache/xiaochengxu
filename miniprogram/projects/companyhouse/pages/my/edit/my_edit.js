@@ -1,132 +1,42 @@
-const pageHelper = require('../../../../../helper/page_helper.js');
-const cloudHelper = require('../../../../../helper/cloud_helper.js');
-const validate = require('../../../../../helper/validate.js');
-const ProjectBiz = require('../../../biz/project_biz.js');
-const projectSetting = require('../../../public/project_setting.js');
-const setting = require('../../../../../setting/setting.js');
-const PassportBiz = require('../../../../../comm/biz/passport_biz.js');
-
-Page({
-	/**
-	 * 页面的初始数据
-	 */
-	data: {
-		isLoad: false,
-		isEdit: true,
-
-		userRegCheck: projectSetting.USER_REG_CHECK,
-		mobileCheck: setting.MOBILE_CHECK
-	},
-
-	/**
-	 * 生命周期函数--监听页面加载
-	 */
-	onLoad: async function (options) {
-		ProjectBiz.initPage(this);
-		await this._loadDetail();
-	},
-
-	_loadDetail: async function (e) { 
-
-		let opts = {
-			title: 'bar'
-		}
-		let user = await cloudHelper.callCloudData('passport/my_detail', {}, opts);
-		if (!user)
-			return wx.redirectTo({ url: '../reg/my_reg' });
-
-		this.setData({
-			isLoad: true,
-			isEdit: true,
-
-			user,
-
-			fields: projectSetting.USER_FIELDS,
-
-			formName: user.USER_NAME,
-			formMobile: user.USER_MOBILE,
-			formForms: user.USER_FORMS
-		})
-	},
-
-	/**
-	 * 生命周期函数--监听页面初次渲染完成
-	 */
-	onReady: function () {
-
-	},
-
-	/**
-	 * 生命周期函数--监听页面显示
-	 */
-	onShow: function () {
-
-	},
-
-	/**
-	 * 生命周期函数--监听页面隐藏
-	 */
-	onHide: function () {
-
-	 (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/miniprogram/projects/companyhouse/pages/my/edit/my_edit.js b/miniprogram/projects/companyhouse/pages/my/edit/my_edit.js
-index 9558cbdf41a3fca13071d9722ad5f93507812758..b22c076a97e89cfb46e93e8767a266763d256299 100644
---- a/miniprogram/projects/companyhouse/pages/my/edit/my_edit.js
-+++ b/miniprogram/projects/companyhouse/pages/my/edit/my_edit.js
-@@ -70,53 +70,50 @@ Page({
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/miniprogram/projects/companyhouse/pages/my/edit/user_form.wxml b/miniprogram/projects/companyhouse/pages/my/edit/user_form.wxml
+index c08db9b252f8f8d313b41bfd8a7937ff8c42eba9..53ecbc15265446f47f534d0d33943248accf9507 100644
+--- a/miniprogram/projects/companyhouse/pages/my/edit/user_form.wxml
++++ b/miniprogram/projects/companyhouse/pages/my/edit/user_form.wxml
+@@ -1,32 +1,27 @@
+ <view class="form-box shadow-project card-project">
+ 	<view class="form-group padding-top-s" wx:if="{{userRegCheck && user.USER_STATUS==8}}">
+ 		<view wx:if="{{!user.USER_CHECK_REASON}}" class="hint-desc text-red"><text class="icon-notice"></text>审核未通过：请修改资料后重新提交</view>
+ 		<view wx:else class="hint-desc text-red"><text class="icon-notice"></text>审核未通过：{{user.USER_CHECK_REASON}}。请修改资料后重新提交</view> 
+ 	</view>
+ 	<view class="form-group padding-top-s" wx:elif="{{userRegCheck && user.USER_STATUS==0}}">
+ 		<view class="hint-desc text-orange"><text class="icon-notice"></text>您的注册资料已经提交，请耐心等待审核~</view> 
+ 	</view>
+ 	
+ 	<view class="form-group">
+ 		<view class="title must">昵称</view>
+ 		<input type="nickname" placeholder="填写您的昵称" placeholder-class="phc" model:value="{{formName}}" maxlength="30"></input>
+ 	</view>
+ 	<view wx:if="{{formNameFocus}}" class="hint-desc error">{{formNameFocus}}</view>
  
- 	},
+ 	<view class="form-group">
+ 		<view class="title must">手机</view>
+-		<input wx:if="{{!mobileCheck}}" placeholder="填写您的手机号码" placeholder-class="phc" model:value="{{formMobile}}" maxlength="11"></input>
+-
+-		<block wx:else>
+-			<view class="mobile">{{formMobile||'未填写'}}</view>
+-			<button open-type="getPhoneNumber" bindgetphonenumber="bindGetPhoneNumber" class="btn phone-button"><text wx:if="{{!formMobile}}">一键填写手机号</text><text wx:else>一键修改手机号</text></button>
+-		</block>
++        <input placeholder="填写您的手机号码" placeholder-class="phc" model:value="{{formMobile}}" maxlength="11"></input>
+ 	</view>
+ 	<view wx:if="{{formMobileFocus}}" class="hint-desc error">{{formMobileFocus}}</view>
  
- 	/**
- 	 * 生命周期函数--监听页面卸载
- 	 */
- 	onUnload: function () {
+ </view>
  
- 	},
- 
- 	/**
- 	 * 页面相关事件处理函数--监听用户下拉动作
- 	 */
- 	onPullDownRefresh: async function () {
- 		await this._loadDetail();
- 		wx.stopPullDownRefresh();
- 	},
- 
- 	/**
- 	 * 页面上拉触底事件的处理函数
- 	 */
- 	onReachBottom: function () {
- 
- 	},
- 
--	bindGetPhoneNumber: async function (e) {
--		await PassportBiz.getPhone(e, this);
--	},
- 
- 
- 	bindSubmitTap: async function (e) {
- 		try {
- 			let data = this.data; 
- 			// 数据校验 
- 			data = validate.check(data, PassportBiz.CHECK_FORM, this);
- 			if (!data) return;
- 
- 			let forms = this.selectComponent("#cmpt-form").getForms(true);
- 			if (!forms) return;
- 			data.forms = forms;
- 
- 			let opts = {
- 				title: '提交中'
- 			}
- 			await cloudHelper.callCloudSumbit('passport/edit_base', data, opts).then(res => {
- 				let callback = () => {
- 					wx.reLaunch({ url: '../index/my_index' });
- 				}
- 				pageHelper.showSuccToast('修改成功', 1500, callback);
- 			});
- 		} catch (err) {
- 			console.error(err);
- 		}
+ <view class="form-box shadow-project card-project margin-top-xs">
+ 	<cmpt-form-show id="cmpt-form" mark="cmpt-form" isCacheMatch="{{false}}" fields="{{fields}}" forms="{{formForms}}" isDefMatch="{{isEdit?false:true}}">
+ 	</cmpt-form-show>
+ </view>
  
 EOF
 )
