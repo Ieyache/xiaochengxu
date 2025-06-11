@@ -68,57 +68,65 @@ Page({
 	 */
 	onHide: function () {
 
-	},
-
-	/**
-	 * 生命周期函数--监听页面卸载
-	 */
-	onUnload: function () {
-
-	},
-
-	/**
-	 * 页面相关事件处理函数--监听用户下拉动作
-	 */
-	onPullDownRefresh: async function () {
-		await this._loadDetail();
-		wx.stopPullDownRefresh();
-	},
-
-	/**
-	 * 页面上拉触底事件的处理函数
-	 */
-	onReachBottom: function () {
-
-	},
-
-	bindGetPhoneNumber: async function (e) {
-		await PassportBiz.getPhone(e, this);
-	},
-
-
-	bindSubmitTap: async function (e) {
-		try {
-			let data = this.data; 
-			// 数据校验 
-			data = validate.check(data, PassportBiz.CHECK_FORM, this);
-			if (!data) return;
-
-			let forms = this.selectComponent("#cmpt-form").getForms(true);
-			if (!forms) return;
-			data.forms = forms;
-
-			let opts = {
-				title: '提交中'
-			}
-			await cloudHelper.callCloudSumbit('passport/edit_base', data, opts).then(res => {
-				let callback = () => {
-					wx.reLaunch({ url: '../index/my_index' });
-				}
-				pageHelper.showSuccToast('修改成功', 1500, callback);
-			});
-		} catch (err) {
-			console.error(err);
-		}
-	}
-})
+	 (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/miniprogram/projects/companyhouse/pages/my/edit/my_edit.js b/miniprogram/projects/companyhouse/pages/my/edit/my_edit.js
+index 9558cbdf41a3fca13071d9722ad5f93507812758..b22c076a97e89cfb46e93e8767a266763d256299 100644
+--- a/miniprogram/projects/companyhouse/pages/my/edit/my_edit.js
++++ b/miniprogram/projects/companyhouse/pages/my/edit/my_edit.js
+@@ -70,53 +70,50 @@ Page({
+ 
+ 	},
+ 
+ 	/**
+ 	 * 生命周期函数--监听页面卸载
+ 	 */
+ 	onUnload: function () {
+ 
+ 	},
+ 
+ 	/**
+ 	 * 页面相关事件处理函数--监听用户下拉动作
+ 	 */
+ 	onPullDownRefresh: async function () {
+ 		await this._loadDetail();
+ 		wx.stopPullDownRefresh();
+ 	},
+ 
+ 	/**
+ 	 * 页面上拉触底事件的处理函数
+ 	 */
+ 	onReachBottom: function () {
+ 
+ 	},
+ 
+-	bindGetPhoneNumber: async function (e) {
+-		await PassportBiz.getPhone(e, this);
+-	},
+ 
+ 
+ 	bindSubmitTap: async function (e) {
+ 		try {
+ 			let data = this.data; 
+ 			// 数据校验 
+ 			data = validate.check(data, PassportBiz.CHECK_FORM, this);
+ 			if (!data) return;
+ 
+ 			let forms = this.selectComponent("#cmpt-form").getForms(true);
+ 			if (!forms) return;
+ 			data.forms = forms;
+ 
+ 			let opts = {
+ 				title: '提交中'
+ 			}
+ 			await cloudHelper.callCloudSumbit('passport/edit_base', data, opts).then(res => {
+ 				let callback = () => {
+ 					wx.reLaunch({ url: '../index/my_index' });
+ 				}
+ 				pageHelper.showSuccToast('修改成功', 1500, callback);
+ 			});
+ 		} catch (err) {
+ 			console.error(err);
+ 		}
+ 
+EOF
+)
