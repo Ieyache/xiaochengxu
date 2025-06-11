@@ -66,78 +66,65 @@ Page({
 
 	/**
 	 * 生命周期函数--监听页面隐藏
-	 */
-	onHide: function () {
-
-	},
-
-	/**
-	 * 生命周期函数--监听页面卸载
-	 */
-	onUnload: function () {
-
-	},
-
-	/**
-	 * 页面相关事件处理函数--监听用户下拉动作
-	 */
-	onPullDownRefresh: async function () {
-	},
-
-	/**
-	 * 页面上拉触底事件的处理函数
-	 */
-	onReachBottom: function () {
-
-	},
-
-	bindGetPhoneNumber: async function (e) {
-		PassportBiz.getPhone(e, this);
-	},
-
-
-	bindSubmitTap: async function (e) {
-		try {
-			let data = this.data;
-
-			// 数据校验 
-			data = validate.check(data, PassportBiz.CHECK_FORM, this);
-			if (!data) return;
-
-			let forms = this.selectComponent("#cmpt-form").getForms(true);
-			if (!forms) return;
-			data.forms = forms;
-
-			data.status = projectSetting.USER_REG_CHECK ? 0 : 1;
-
-			let opts = {
-				title: '提交中'
-			}
-			await cloudHelper.callCloudSumbit('passport/register', data, opts).then(result => {
-				if (result && helper.isDefined(result.data.token) && result.data.token) {
-
-					// 用户需要审核，不能登录
-					if (!projectSetting.USER_REG_CHECK) PassportBiz.setToken(result.data.token);
-
-					let callback = () => {
-						if (this.data.retUrl == 'back')
-							wx.navigateBack();
-						else if (this.data.retUrl)
-							wx.redirectTo({
-								url: this.data.retUrl,
-							})
-						else
-						wx.reLaunch({ url: '../index/my_index' });
-					}
-
-					if (projectSetting.USER_REG_CHECK)
-						pageHelper.showModal('注册完成，等待系统审核', '温馨提示', callback);
-					else
-					pageHelper.showSuccToast('注册成功', 1500, callback);
-				}
-			});
-		} catch (err) {
-			console.error(err);
-		}
-	}
-})
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/miniprogram/projects/companyhouse/pages/my/reg/my_reg.js b/miniprogram/projects/companyhouse/pages/my/reg/my_reg.js
+index e1175dcebaad1895c657b1b2b960bccb5125a558..e8f072f2a7f07e8a9eb2ddc4623382c08dc6105f 100644
+--- a/miniprogram/projects/companyhouse/pages/my/reg/my_reg.js
++++ b/miniprogram/projects/companyhouse/pages/my/reg/my_reg.js
+@@ -69,53 +69,50 @@ Page({
+ 	 */
+ 	onHide: function () {
+ 
+ 	},
+ 
+ 	/**
+ 	 * 生命周期函数--监听页面卸载
+ 	 */
+ 	onUnload: function () {
+ 
+ 	},
+ 
+ 	/**
+ 	 * 页面相关事件处理函数--监听用户下拉动作
+ 	 */
+ 	onPullDownRefresh: async function () {
+ 	},
+ 
+ 	/**
+ 	 * 页面上拉触底事件的处理函数
+ 	 */
+ 	onReachBottom: function () {
+ 
+ 	},
+ 
+-	bindGetPhoneNumber: async function (e) {
+-		PassportBiz.getPhone(e, this);
+-	},
+ 
+ 
+ 	bindSubmitTap: async function (e) {
+ 		try {
+ 			let data = this.data;
+ 
+ 			// 数据校验 
+ 			data = validate.check(data, PassportBiz.CHECK_FORM, this);
+ 			if (!data) return;
+ 
+ 			let forms = this.selectComponent("#cmpt-form").getForms(true);
+ 			if (!forms) return;
+ 			data.forms = forms;
+ 
+ 			data.status = projectSetting.USER_REG_CHECK ? 0 : 1;
+ 
+ 			let opts = {
+ 				title: '提交中'
+ 			}
+ 			await cloudHelper.callCloudSumbit('passport/register', data, opts).then(result => {
+ 				if (result && helper.isDefined(result.data.token) && result.data.token) {
+ 
+ 					// 用户需要审核，不能登录
+ 					if (!projectSetting.USER_REG_CHECK) PassportBiz.setToken(result.data.token);
+ 
+ 
+EOF
+)
